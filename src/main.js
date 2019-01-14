@@ -23,8 +23,6 @@ import VueWechatTitle from 'vue-wechat-title';
  Vue.prototype._path = _path //挂载到Vue实例上面
 Vue.use(VueWechatTitle)
 
-
-
 Vue.use(VueAxios, axios)
 Vue.use(ElementUI)
 
