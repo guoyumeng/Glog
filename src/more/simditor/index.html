@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" type="text/css" href="./simditor.css" />
+</head>
+<body>
+	<textarea id="editor" rows="10" cols="100">
+		
+	</textarea>
+</body>
+<script type="text/javascript" src="./jquery.min.js"></script>
+<script type="text/javascript" src="./module.js"></script>
+<script type="text/javascript" src="./hotkeys.js"></script>
+<script type="text/javascript" src="./uploader.js"></script>
+<script type="text/javascript" src="./simditor.js"></script>
+<script type="text/javascript">
+	var editor = new Simditor({
+		  textarea: $('#editor')
+		  //optional options
+		});
+</script>
+</html>
