@@ -36,7 +36,7 @@
             </div>
 
             <div v-else id="header_user">
-                <el-dropdown>
+                <el-dropdown style="cursor:pointer">
                     <span class="el-dropdown-link">{{ username }}<i class="el-icon-arrow-down el-icon--right"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
@@ -80,7 +80,7 @@
         </div>
 
         <div id="IE_OUT">
-            <img src="../../../static/pic/IE_bg1.gif" alt="">
+            
             <div>
                 <i class="iconfont icon-ie"></i>
                 <p>IE 浏览器已不再受到本站支持</p>
@@ -97,7 +97,7 @@
                     <p><el-tag type="success" size="small">2003 年</el-tag>IE 达到 95% 的使用率高峰</p>
                     <p style="margin-left:100px;">······</p>
                     <p><el-tag type="warning" size="small">2015 年</el-tag>微软宣布 IE 的默认浏览器地位被 Edge 取代</p>
-                    <p><el-tag type="danger" size="small">2016 年 1 月</el-tag>微软正式停止发布 IE11 之前版本的安全性更新......</p>
+                    <p><el-tag type="danger" size="small">2016 年</el-tag>微软正式停止发布 IE11 之前版本的安全性更新......</p>
                 </div>
             </div>
         </div>
@@ -194,7 +194,25 @@
              }
              
             
-        }
+        },
+
+        add_visit(){
+            var that = this;
+            
+
+                var data = new FormData();
+                
+                data.append("province",'NULL');
+                data.append("city",'NULL');
+                data.append("ip",'NULL');
+                
+                // 将数据提交至服务器
+                this.axios.post(that._path.php_path+"/php/add_visit.php",data)
+                
+            
+            
+        },
+
     },
 
     mounted(){
@@ -202,6 +220,7 @@
         this.getclass();
         this.IEVersion();
         
+        this.add_visit()
         
         $("#top_search_input").blur(function(){
             console.log($("#top_search_input"));
@@ -221,15 +240,19 @@
             $("#top_search_title").css("display","none");
         });
 
-
-
         $("#wrapper").css("min-height",(document.documentElement.clientHeight) + "px");
+
+
+        
 
 
 
     }
 }
 </script>
+
+
+
 <style lang="scss">
 
     #top_search:hover>p{
@@ -359,24 +382,18 @@
 
     #IE_OUT{
         display: none;
-    }
-    #IE_OUT>img{
         
-        height: 100%;
-        width:100%;
-        position:fixed;
-        left: 0;
-        top: 0;
     }
 
     #IE_OUT>div{
+        
         display: flex;
         flex-direction:column;
         align-items:center;
         justify-content:center;
         height: 100%;
         width:100%;
-        background-color: rgba(255, 255, 255, 0.8);
+        background-color: #FFFFFF;
         position:fixed;
         right:0;
         bottom:0;

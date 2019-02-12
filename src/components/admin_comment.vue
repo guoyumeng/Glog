@@ -132,7 +132,7 @@
                                 if (data.length > 0) {
 									res.data[i].username = data[0].username;
 								}else{
-									res.data[i].username = "[用户已注销]";
+									res.data[i].username = "用户已注销";
 								}
                             }
                         })

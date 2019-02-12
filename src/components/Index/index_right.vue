@@ -1,16 +1,16 @@
 <template>
 
         <!-- 前台右侧区域 -->
-        <div>
+        <div id="index_right">
 
             <!-- 右侧区域一 -->
             <div id="index_main_right1">
                 <el-collapse v-model="activeName" accordion>
-                <p class="right_title">推荐内容</p>
+                <p class="right_title" style="color:#333333">推荐内容</p>
 
                 
                 <el-collapse-item v-for="(data,index) in important_list" :key="index" :title="data.title" class="right1_title">
-                    <div style="padding:0 1em;cursor: pointer;" @click="clickCard(data)">{{ data.content }}</div>
+                    <div style="padding:0 1em;cursor: pointer;color:#666;" @click="clickCard(data)">{{ data.content }}</div>
                 </el-collapse-item>
 
 
@@ -20,7 +20,7 @@
             <!-- 右侧区域二 -->
             <div id="index_main_right2">
                 <el-collapse v-model="activeName2" accordion>
-                <p class="right_title">热度最高</p>
+                <p class="right_title" style="color:#333333">热度最高</p>
 
                 <el-collapse-item v-for="(data,index) in hot_list" :key="index" :title="data.title" class="right1_title">
                     <div style="padding:0 1em;cursor: pointer;" @click="clickCard(data)">{{ data.content }}</div>
@@ -33,15 +33,15 @@
             <el-button type="primary" icon="el-icon-edit" round id="write_button" @click="dialogFormVisible = true">写信</el-button>
 
             <!-- 写信弹出框 -->
-            <el-dialog title="给我写信" center :visible.sync="dialogFormVisible" id="a2">
+            <el-dialog title="给我写信" center :visible.sync="dialogFormVisible" id="a2" width="750px" :modal="false">
                 <el-form :model="form">
 
                     <!-- 提示与直接写电子信 -->
                     <p style="clear:both;margin-top:-10px;padding-bottom:40px">
                         <el-alert
-                            title="此处内容将通过站内信发送于我，你也可以直接向我发送电子邮件。"
+                            title="你也可以直接向我发送电子邮件。"
                             type="info"
-                            style="width:69%;float:left"
+                            style="width:65%;float:left"
                             :closable="false"
                             show-icon>
                         </el-alert>
@@ -145,6 +145,11 @@
                         if (res.data[i].title.length>19) {
                             res.data[i].title = res.data[i].title.substr(0,19)+'...'
                         }
+                        if (res.data[i].content.length) {
+                            var re1 = new RegExp("<.+?>","g");//匹配html标签的正则表达式，"g"是搜索匹配多个符合的内容
+                            var msg = res.data[i].content.replace(re1,'');//执行替换成空字符
+                            res.data[i].content = msg;
+                        }
                         if (res.data[i].content.length>100) {
                             res.data[i].content = res.data[i].content.substr(0,100)+'...'
                         }
@@ -159,8 +164,11 @@
                     for (let i = 0; i < res.data.length; i++) {
                         res.data[i].publish_time = res.data[i].publish_time.substr(0,16);
 
-                        if (res.data[i].title.length>19) {
-                            res.data[i].title = res.data[i].title.substr(0,19)+'...'
+                        
+                        if (res.data[i].content.length) {
+                            var re1 = new RegExp("<.+?>","g");//匹配html标签的正则表达式，"g"是搜索匹配多个符合的内容
+                            var msg = res.data[i].content.replace(re1,'');//执行替换成空字符
+                            res.data[i].content = msg;
                         }
                         if (res.data[i].content.length>100) {
                             res.data[i].content = res.data[i].content.substr(0,100)+'...'
@@ -227,15 +235,10 @@
     }
 
     #a2{
-        background-image:url("../../../static/pic/2.jpg");
-        background-size: 100% auto;
+        background-color:#7093DB;
     }
-    #a2>*{
-        width:750px;
-        background-image:url("../../../static/pic/1.jpg");
-        background-size: 100% auto;
-        
-    }  
+     
+    
 
     
 
@@ -243,7 +246,12 @@
 
 </style>
 <style>
-    .v-modal{
-        z-index: -1 !important;
+    #index_right .el-collapse-item__content{
+        padding-bottom: 15px !important;
+    }
+    #index_right .el-collapse-item__header{
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
     }
 </style>

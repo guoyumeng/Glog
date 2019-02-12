@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div id="main">
+        <div id="main" class="register">
             <div id="main_top">
                 <div>
                     <p>注册 Glog 账号</p>
@@ -15,15 +15,17 @@
                         <el-radio v-model="sex" label="女">女</el-radio>
                         <el-radio v-model="sex" label="保密">保密</el-radio>
                     </span>
+
                     <el-upload
                     class="avatar-uploader"
-                    action="https://jsonplaceholder.typicode.com/posts/"
+                    :action="this._path.php_path+'/php/upload/'"
                     :show-file-list="false"
                     :on-success="handleAvatarSuccess"
                     :before-upload="beforeAvatarUpload">
                         <img v-if="imageUrl" :src="imageUrl" class="avatar">
                         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                     </el-upload>
+                    
                     <div>
                         <el-button type="primary" size="medium" round @click="reg()">注册</el-button>
                     </div>
@@ -53,14 +55,16 @@
     methods: {
 
         handleAvatarSuccess(res, file) {
-            this.imageUrl = URL.createObjectURL(file.raw);
+            this.imageUrl = res;
         },
         beforeAvatarUpload(file) {
+            console.log(file);
+            
             const isJPG = file.type === 'image/jpeg';
             const isLt2M = file.size / 1024 / 1024 < 2;
-
+            
             if (!isJPG) {
-            this.$message.error('上传头像图片只能是 JPG 格式!');
+            this.$message.error('上传头像图片只能是 JPG 或者 PNG 格式!');
             }
             if (!isLt2M) {
             this.$message.error('上传头像图片大小不能超过 2MB!');
@@ -109,27 +113,31 @@
                                 type: 'error'
                             });
                         }else{
-                            var data = new FormData();
-                            data.append("username",that.username);
-                            data.append("password",that.password);
-                            data.append("sex",that.sex);
 
-                            that.axios.get("https://api.ip.la/cn?json").then(res=>{
-                                data.append("country",res.data.location.country_name);
-                                data.append("province",res.data.location.province);
-                                data.append("city",res.data.location.city);
-                                data.append("register_ip",res.data.ip);
+                                var data = new FormData();
+                                data.append("username",that.username);
+                                data.append("password",that.password);
+                                data.append("sex",that.sex);
+                                data.append("imageUrl",that.imageUrl);
+
+                                data.append("province",'NULL');
+                                data.append("city",'NULL');
+                                data.append("register_ip",'NULL');
                                 
-
+                                // 将数据提交至服务器
                                 that.axios.post(that._path.php_path+"/php/user_reg.php",data).then(res=>{
                                     that.$message({
                                         message: '注册成功！请登录。',
                                         type: 'success'
                                     });
-                                    window.location.assign("/login");
+                                    window.setTimeout(() => {
+                                        window.location.assign("/login");
+                                    },2000)
                                 })
+                                
 
-                            })
+
+
                         }
                         
                         
@@ -156,6 +164,8 @@
 
 
 
+    
+
     #main{
         width:100%;
         border:1px solid #ddd;
@@ -180,11 +190,13 @@
                     margin-bottom: 10px;
                 }
                 >.input{
-         
+                    
                     margin:7px 0;
                     width: 300px;
                     font-size: 14px;
+                    
                 }
+                
                 >div{
                     margin-top: 20px;
 
@@ -195,6 +207,7 @@
                 }
             }
         }
+        
         #main_bottom{
             
             background-color: #f5f8fa;
@@ -229,14 +242,18 @@
   .avatar-uploader-icon {
     font-size: 28px;
     color: #8c939d;
-    width: 178px;
-    height: 178px;
-    line-height: 178px;
+    width: 150px;
+    height: 150px;
+    line-height: 150px;
     text-align: center;
   }
   .avatar {
-    width: 178px;
-    height: 178px;
+    width: 150px;
+    height: 150px;
     display: block;
   }
+
+  .register .el-input__inner{
+        border-radius: 0 !important;
+    }
 </style>

@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div id="user">
 		<!-- 添加用户按钮 -->
 		<el-button type="primary" round @click="add()" style="margin-bottom:20px" id="add_btn">添加用户</el-button>
 
@@ -279,7 +279,7 @@
 				this.axios.post(that._path.php_path+'/php/getData.php',data).then(res=>{
 					if(res.data.length > 0){
 						for (let i = 0; i < res.data.length; i++) {
-							res.data[i].dz = `${res.data[i].country} ${res.data[i].province} ${res.data[i].city}`;
+							res.data[i].dz = `${res.data[i].province} ${res.data[i].city}`;
 							res.data[i].age = Math.floor((Date.parse(new Date())/1000-res.data[i].birthday)/(60*60*24*365))+"岁";
 							res.data[i].birthday2 = new Date(res.data[i].birthday*1000).Format("yyyy 年 M 月 d 日")
 						}
@@ -398,34 +398,32 @@
 
 			add_user_2(){
 				var that = this;
-				this.submit_loading = true;
-				var data = new FormData();
-				this.add_loading_title = "提交中";
-				data.append("username",this.form.username);
-				data.append("password",this.form.password);
-				data.append("sex",this.form.sex);
-				data.append("address",this.form.address);
-				data.append("birthday",this.form.birthday);
-				data.append("now",this.now);
-				data.append("uid",this.form.uid);
 
-				// 通过第三方接口取得IP位置等信息
-				this.axios.get("https://api.ip.la/cn?json").then(res=>{
-					data.append("country",res.data.location.country_name);
-					data.append("province",res.data.location.province);
-					data.append("city",res.data.location.city);
-					data.append("register_ip",res.data.ip);
+					that.submit_loading = true;
+					var data = new FormData();
+					that.add_loading_title = "提交中";
+					data.append("username",that.form.username);
+					data.append("password",that.form.password);
+					data.append("sex",that.form.sex);
+					data.append("address",that.form.address);
+					data.append("birthday",that.form.birthday);
+					data.append("now",that.now);
+					data.append("uid",that.form.uid);
+
+					data.append("province",'NULL');
+					data.append("city",'NULL');
+					data.append("register_ip",'NULL');
 					
 					// 将数据提交至服务器
-					this.axios.post(that._path.php_path+"/php/adduser.php",data).then(res=>{
-						this.dialogFormVisible = false;
-						this.submit_loading = false;
-						this.add_loading_title = "提 交";
-						this.$message({
+					that.axios.post(that._path.php_path+"/php/adduser.php",data).then(res=>{
+						that.dialogFormVisible = false;
+						that.submit_loading = false;
+						that.add_loading_title = "提 交";
+						that.$message({
 							type: 'success',
 							message: '添加成功!'
 						});
-						this.form = {
+						that.form = {
 							username: '',
 							tag: '',
 							birthday: '',
@@ -433,16 +431,16 @@
 							sex: '男',
 							address: '',
 						}
-						this.getList();
+						that.getList();
 					}).catch(res=>{
-						this.submit_loading = false;
-						this.add_loading_title = "提 交";
-						this.$message({
+						that.submit_loading = false;
+						that.add_loading_title = "提 交";
+						that.$message({
 							type: 'error',
 							message: '添加失败!'
 						});
 					})
-				})
+
 			},
 
 		},
@@ -488,4 +486,11 @@
 		color: #F56C6C;
   }
 
+  
+
+</style>
+<style>
+	#user .el-input--suffix{
+	  width: 100px !important;
+  }
 </style>

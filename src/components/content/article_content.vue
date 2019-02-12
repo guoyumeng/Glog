@@ -15,13 +15,13 @@
                     </p>
 
                     <hr>
-                    <div style="padding:10px 0">{{ this.data.content }}</div>
+                    <div id="article_content" style="padding:10px 0"></div>
                     <p style="float:right;font-size:12px;color:#909399">原创内容，受版权保护</p>
                 </div>
             </div>
             <div id="main_bottom">
                 
-                <div>
+                <div style="min-height:120px;">
                     <template v-if="this.username == ''">
                         <textarea id="comment_input_dis" rows="3" v-model="user_input" disabled placeholder="要发表评论需要先登录哦"></textarea>
                         
@@ -35,7 +35,7 @@
                     <el-card v-for="(data,index) in comment_data" :key="index" class="box-card" shadow="hover">
                         <div slot="header" class="clearfix user_card">
                             <div style="display:inline-flex">
-                                <img class="user_pic" src="../../../static/pic/tx.jpg" alt="头像">
+                                <img class="user_pic" :src="data.headPortrait" alt="头像">
                                 <div class="username_box">
                                     <span class="user_name">{{data.username}}</span>
                                     <span class="write_time">{{data.time}}</span>
@@ -74,7 +74,9 @@
       return {
           username: '',
           user_input: '',
-          data: '',
+          data: {
+              read_num:0,
+          },
           uid: '',
           comment_data: [],
       };
@@ -88,6 +90,11 @@
             data.append("content",this.user_input);
             data.append("of_article",this.data.aid);
             this.axios.post(that._path.php_path+'/php/add_comment.php',data).then(res=>{
+                this.user_input = '';
+                this.$message({
+                    message: '评论发表成功！',
+                    type: 'success'
+                });
                 this.getdata();
             })
         },
@@ -208,11 +215,15 @@
                                 },
                             
                                 success:function(data){
+                                    console.log(data);
+                                    
                                     if (data.length == 0) {
-                                        res.data[i].username = "[用户已注销]"
+                                        res.data[i].username = "用户已注销"
+                                        res.data[i].headPortrait = "../../../static/pic/user-default.png"
                                     }else{
 
                                         res.data[i].username = data[0].username;
+                                        res.data[i].headPortrait = data[0].imageUrl;
                                     }
                                     
                                 }
@@ -221,9 +232,10 @@
                         }
                         this.comment_data = res.data;
                     })
+
+                    document.getElementById("article_content").innerHTML = that.data.content;
                 }
             })
-
             
             
             

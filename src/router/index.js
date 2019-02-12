@@ -108,6 +108,6 @@ export default new Router({
 		    },
 
 		  ]
-		},
+		}
   ]
 })

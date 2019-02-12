@@ -4,21 +4,24 @@
         <!-- 卡片循环区 -->
         <el-card class="box-card" v-for="(data,index) in listData" :key="index" shadow="hover" style="border-radius: 0">
             <div slot="header" class="clearfix">
-                <span style="font-weight:bold;color:#606266;cursor:pointer" @click="clickCard(data)">{{ data.title }}</span>
+                <span style="font-weight:bold;color:#333333;cursor:pointer" @click="clickCard(data)">{{ data.title }}</span>
                 <el-tag v-for="(sdata,index2) in data.class" size="medium" :key="index2" style="margin-left: 10px; float:right;cursor:pointer">{{ sdata }}</el-tag>
             </div>
             <div>
                 <p style="margin-top:-10px">
-                <span class="el-icon-time" style="color:#606266;font-size:13px">{{`&nbsp;&nbsp;`+data.publish_time }}</span>
+                    <span class="el-icon-time" style="color:#606266;font-size:13px">{{`&nbsp;&nbsp;`+data.publish_time }}</span>
                     <el-tag type="info" size="mini" style="margin-left:10px;cursor:pointer">{{ data.author }}</el-tag>
                 </p>
-                <span @click="clickCard(data)" style="cursor:pointer">
-                    {{ data.content }}
-                </span>
+                <div @click="clickCard(data)" style="cursor:pointer;display:flex;align-items:flex-start;">
+                   
+                    <img class="index_card_img" v-if="data.headerPic" :src="data.headerPic">
+                    
+                    <span style="text-indent:1em;color:#666;">{{ data.content }}</span>
+                </div>
                 
             </div>
         </el-card>
-        <div id="goto_top">
+        <div v-if="goto_top" id="goto_top">
             <i class="iconfont icon-GlogLOGO"></i>
             <span>回到顶部</span>
         </div>
@@ -34,6 +37,7 @@
             return {
                 listData: [],
                 cid: '',
+                goto_top:false,
             }
         },
         methods:{
@@ -84,8 +88,13 @@
                             }else{
                                 res.data[i].class = [];
                             }
-                            if (res.data[i].content.length>200) {
-                                res.data[i].content = res.data[i].content.substr(0,200)+'...'
+                            if (res.data[i].content.length) {
+                                var re1 = new RegExp("<.+?>","g");//匹配html标签的正则表达式，"g"是搜索匹配多个符合的内容
+                                var msg = res.data[i].content.replace(re1,'');//执行替换成空字符
+                                res.data[i].content = msg;
+                            }
+                            if (res.data[i].content.length>130) {
+                                res.data[i].content = res.data[i].content.substr(0,130)+'......'
                             }
                         }
                     }
@@ -110,8 +119,17 @@
             this.getData();
 
             $("#goto_top").click(function () {
+                
                 document.documentElement.scrollTop = 0;
             })
+
+            window.onscroll = () => {
+                if (document.documentElement.scrollTop > 1000) {
+                    this.goto_top = true;
+                }else{
+                    this.goto_top = false;
+                }
+            }
         },
         watch:{
             $route(to,from){
@@ -164,6 +182,15 @@
             color: #909399;
             font-size: 12px;
         }
+    }
+
+    .index_card_img{
+        width:150px;
+        height:100px;
+        border-radius:5px;
+        border:1px solid #eee;
+        flex-shrink:0;
+        margin-right:10px;
     }
 
     

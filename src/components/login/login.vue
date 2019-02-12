@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div id="main">
+        <div id="main" class="login">
             <div id="main_top">
                 <div>
                     <p>登录 Glog</p>
@@ -137,4 +137,9 @@
 
 
     
+</style>
+<style>
+    .login .el-input__inner{
+        border-radius: 0 !important;
+    }
 </style>

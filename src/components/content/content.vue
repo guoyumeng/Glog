@@ -21,7 +21,7 @@
             </div>
 
             <div v-else id="header_user">
-                <el-dropdown>
+                <el-dropdown style="cursor:pointer">
                     <span class="el-dropdown-link">{{ username }}<i class="el-icon-arrow-down el-icon--right"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">

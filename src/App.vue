@@ -25,4 +25,8 @@
 		margin:0;
 		padding:0;
 	}
+	*{
+		font-family: '微软雅黑';
+		letter-spacing:0.5px;
+	}
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div>
-		<el-container>
+		<el-container id="id1">
 			<el-header id="header">
 				<el-menu 
 				:default-active="$route.path"
@@ -16,11 +16,11 @@
 					<el-menu-item index="/">进入主站</el-menu-item>
 				</el-menu>
 			</el-header>
-			<el-main>
+			<el-main style="padding-bottom:70px;">
 
 				<router-view></router-view>
 			</el-main>
-			<el-footer id="footer" style="height:auto">
+			<el-footer id="footer" style="height:auto;position:fixed;bottom:0;width:100%;">
 				<a href="#">帮助</a>
 				<a href="#">数据统计</a>
 				<a href="#">网站地图</a>
@@ -97,12 +97,14 @@
 		}
 	}
 </script>
+<style>
 
+</style>
 <style scoped>
 	html,body{
 		margin:0;
 		padding: 0;
-
+		
 	}
 
 	#header *{

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="admin_login">
 		<el-card class="box-card">
         <div slot="header" class="clearfix">
             <span>后台管理系统</span>
@@ -70,7 +70,7 @@
 	}
 </script>
 <style>
-    .input .el-input__inner{
+    #admin_login .input .el-input__inner{
       border-radius: 0;
       margin: 10px 0;
   }

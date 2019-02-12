@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div id="article">
 		<!-- 添加用户按钮 -->
 		<el-button type="primary" round @click="add()" style="margin-bottom:20px" id="add_btn">创建文章</el-button>
 
@@ -16,7 +16,7 @@
 		</div>
 
 		<!-- 新增用户弹出框 -->
-		<el-dialog :title=add_dialog_title :visible.sync="dialogFormVisible">
+		<el-dialog :title="add_dialog_title" :visible.sync="dialogFormVisible" :fullscreen="true" center>
 		  <el-form :model="form">
 
 		    <el-form-item label="文章标题" :label-width="formLabelWidth">
@@ -27,38 +27,56 @@
 		      <el-input v-model="form.author" autocomplete="off" style="width:40%" prefix-icon="el-icon-edit"></el-input>
 		    </el-form-item>
 
-				<el-form-item label="分类" :label-width="formLabelWidth">
-					<el-checkbox-group v-model="form.class" :max="3">
-						
-						<el-checkbox v-for="(data,index) in classlist" :key="index" :label=data></el-checkbox>
+			<el-form-item label="分类" :label-width="formLabelWidth">
+				<el-checkbox-group v-model="form.class" :max="3">
+					
+					<el-checkbox v-for="(data,index) in classlist" :key="index" :label="data"></el-checkbox>
 
-					</el-checkbox-group>
+				</el-checkbox-group>
 		    </el-form-item>
 
-				<el-form-item :label-width="formLabelWidth">
-					<el-switch
-						style="display: inline-block"
-						v-model="form.state"
-						active-color="#13ce66"
-						inactive-color="#ff4949"
-						active-text="立即发布"
-						inactive-text="暂不发布">
-					</el-switch>
-					<el-switch
-						style="display: inline-block;margin-left:20px"
-						v-model="form.important"
-						active-text="置顶内容"
-						inactive-text="普通内容">
-					</el-switch>
+			<el-form-item :label-width="formLabelWidth">
+				<el-switch
+					style="display: inline-block"
+					v-model="form.state"
+					active-color="#13ce66"
+					inactive-color="#ff4949"
+					active-text="立即发布"
+					inactive-text="暂不发布">
+				</el-switch>
+				<el-switch
+					style="display: inline-block;margin-left:20px"
+					v-model="form.important"
+					active-text="置顶内容"
+					inactive-text="普通内容">
+				</el-switch>
 		    </el-form-item>
 
-				<el-form-item label="文章内容" :label-width="formLabelWidth">
-					<el-input
-						type="textarea"
-						:autosize="{ minRows: 5, maxRows: 20}"
-						placeholder="请输入内容"
-						v-model="form.content">
-					</el-input>
+			<el-form-item label="封面" :label-width="formLabelWidth">
+		      	<el-upload
+                    class="avatar-uploader"
+                    :action="this._path.php_path+'/php/upload/'"
+                    :show-file-list="false"
+                    :on-success="handleAvatarSuccess"
+                    :before-upload="beforeAvatarUpload">
+					<img v-if="form.headerPic" :src="form.headerPic" class="avatar">
+					<i v-else class="el-icon-plus avatar-uploader-icon"></i>
+				</el-upload>
+		    </el-form-item>
+
+			<el-form-item label="文章内容" :label-width="formLabelWidth">
+
+				<div>
+					<tinymce-editor v-model="form.content"
+					:disabled="disabled"
+					@onClick="onClick"
+					ref="editor"></tinymce-editor>
+					<input type="button" @click="clear" value="清空内容">
+					<input type="button" @click="disabled = true" value="禁用">
+					<input type="button" @click="disabled = false" value="启用">
+				</div>
+
+
 		    </el-form-item>
 				
 
@@ -67,7 +85,7 @@
 		  </el-form>
 		  <div slot="footer" class="dialog-footer">
 		    <el-button @click="qvxiao()">取 消</el-button>
-		    <el-button type="primary" @click="add_user(form)" :loading=submit_loading>{{add_loading_title}}</el-button>
+		    <el-button type="primary" @click="add_user(form)" :loading="submit_loading">{{add_loading_title}}</el-button>
 		  </div>
 		</el-dialog>
 
@@ -84,7 +102,7 @@
 			<el-tag type="info" size="small" style="margin-left:10px">{{ show.author }}</el-tag>
 			<el-tag v-for="(prop,index) in show.class" :key="index" style="margin-left: 10px;margin-top:-10px; float:right">{{ prop }}</el-tag>
 			<hr style="border:none;border-top:1px solid #C0C4CC;margin:10px 0">
-			<div style="color:#606266;font-size:14px">{{ show.content }}</div>
+			<div style="color:#606266;font-size:14px" id="showContent"></div>
 
 			<span slot="footer" class="dialog-footer">
 				<el-button type="primary" @click="centerDialogVisible = false">确 定</el-button>
@@ -227,10 +245,16 @@
 
 
 <script>
-	
+import TinymceEditor from '../../api/editor.vue'
   export default {
+	  components: {
+		TinymceEditor
+	},
 		data() {
 			return {
+
+				disabled:false,
+
 				centerDialogVisible: false,
 				add_loading_title: "提 交",
 				submit_loading: false,
@@ -259,7 +283,8 @@
 					content: '',
 					author: '',
 					important: false,
-					class: []
+					class: [],
+					headerPic: '',
 				},
 				show: {
 					title: '',
@@ -277,6 +302,27 @@
 		},
 		
 		methods:{
+
+			handleAvatarSuccess(res, file) {
+            this.form.headerPic = res;
+        },
+        beforeAvatarUpload(file) {
+            console.log(file);
+            
+            const isJPG = file.type === 'image/jpeg';
+            const isLt2M = file.size / 1024 / 1024 < 2;
+            
+            if (!isJPG) {
+            this.$message.error('上传头像图片只能是 JPG 或者 PNG 格式!');
+            }
+            if (!isLt2M) {
+            this.$message.error('上传头像图片大小不能超过 2MB!');
+            }
+            return isJPG && isLt2M;
+        },
+
+			 onEditorReady(editor) {
+      },
 
 			toComment(data){
 				window.location.assign("/admin/comment/"+data.aid);
@@ -312,7 +358,9 @@
 					state: true,
 					content: '',
 					author: '',
-					class: []
+					class: [],
+					important: false,
+					headerPic: '',
 				}
 			},
 
@@ -348,6 +396,7 @@
 					author: '',
 					class: [],
 					important: false,
+					headerPic: '',
 				}
 			},
 
@@ -467,6 +516,8 @@
 				this.show.class = row.class;
 				this.show.time = row.publish_time;
 				this.show.author = row.author;
+
+				document.getElementById("showContent").innerHTML = this.show.content;
         
 			},
 
@@ -482,6 +533,7 @@
 					important: row.important,
 					class: row.class,
 					author: row.author,
+					headerPic: row.headerPic,
 				}
 				this.dialogFormVisible = true;
 			},
@@ -549,6 +601,7 @@
 				data.append("content",this.form.content);
 				data.append("author",this.form.author);
 				data.append("class",this.newlist);
+				data.append("headerPic",this.form.headerPic);
 
 
 				data.append("now",this.now);
@@ -581,14 +634,22 @@
 							message: '提交失败!'
 						});
 					})
-			}
+			},
+
+			onClick(e, editor) {
+			/* console.log('Element clicked')
+			console.log(e)
+			console.log(editor) */
+			//   console.log(this.msg);
+			
+			},
+			//清空内容
+			clear() {
+			this.$refs.editor.clear()
+			},
 
 		},
 		mounted(){
-			this.getList();
-			
-			
-		
 			// 自动调整搜索框长度
 			window.onresize=function(){
 				if (document.getElementById("search_input")) {
@@ -602,7 +663,14 @@
 					document.getElementById("search_input").style.width = document.documentElement.clientWidth - document.getElementById("add_btn").offsetWidth - 70 + "px";
 				}
 			},0)
-		}
+			
+			this.getList();
+			
+			
+		
+			
+		},
+		
 	}
 	
 	
@@ -642,5 +710,38 @@
 .el-badge__content{
 	z-index: 1000;
 }
+
+</style>
+<style>
+	
+
+	.avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  #article .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 150px;
+    height: 100px;
+    line-height: 100px;
+    text-align: center;
+  }
+  #article .avatar {
+    width: 150px;
+    height: 100px;
+    display: block;
+  }
+
+
+	#article .el-input--suffix{
+	  width: 100px !important;
+  }
 
 </style>

@@ -269,22 +269,30 @@
                             }
                         }else{
                             if (state == "deleteAll") {
-                                $.ajax({
-                                    url:that._path.php_path+'/php/del_class.php',//url路径
-                                    type:'POST', //GET
-                                    async:false, //或false,是否异步
-                                    data:{//参数
-                                        "cid":row.cid,
-                                    },
-                                    // timeout:5000, //超时时间
-                                
-                                    success:function(data){
-                                        that.$message({
-                                            type: 'success',
-                                            message: '已删除 '+row.class_name
-                                        });          
-                                    }
+                                this.$confirm('所有文章下的该标签已移除，是否继续删除该标签?', '警告', {
+                                confirmButtonText: '确定',
+                                cancelButtonText: '取消',
+                                type: 'error'
+                                }).then(() => {
+                                    $.ajax({
+                                        url:that._path.php_path+'/php/del_class.php',//url路径
+                                        type:'POST', //GET
+                                        async:false, //或false,是否异步
+                                        data:{//参数
+                                            "cid":row.cid,
+                                        },
+                                        // timeout:5000, //超时时间
+                                    
+                                        success:function(data){
+                                            that.$message({
+                                                type: 'success',
+                                                message: '已删除 '+row.class_name
+                                            });
+                                            that.getList();        
+                                        }
+                                    })
                                 })
+                                
                             }else{
                                 that.$message({
                                     type: 'info',
